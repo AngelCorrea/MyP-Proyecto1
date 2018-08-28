@@ -14,20 +14,18 @@ name= gets.chop
 usr1=Usuario.new
 usr1.setNombre("name")
 puts "Su usuario es #{name}\n"
+#while mensajesServer=s.gets
+#    puts mensajesServer
+#  end
 
-s.puts name
 
-
+#Recibe los mensajes del usuario y los envia a el servidor
   begin
-    line= s.gets
-    puts line
-    line= s.gets
-    puts line
-  m=gets
-  s.puts m
-  line= s.gets
-  puts line
-  s.puts "Cliente desconectandose"
+    while m=gets.chop and m!="/close"
+      s.puts "#{name}: "+m
+    end
+puts "Saliendo del servidor..."
+s.puts "Cliente desconectandose"
 s.close
 end
 

@@ -1,30 +1,34 @@
 #Se llama el recurso "socket"
 require 'socket'
+require './Auxiliares.rb'
 #Socket abierto para escuchar en el puerto "1234"
 class Servidor
-  puts "Introduzca su IP: "
-  host = gets.chop
-  puts "Introduzca su Puerto:"
-  port = gets.chop
-
+  port =1234
   puts "Servidor iniciandose... "
-  server = TCPServer.open(host,port)
-  while(sesion=server.accept)
-    #El servidor acepta a los que intenten conectarse
-    Thread.start do
-    puts "Conectado desde #{sesion.peeraddr[2]} en #{sesion.peeraddr[3]}"
-    sesion.puts "Server : Bienvenido, su ip es #{sesion.peeraddr[2]}\n"
-    sesion.puts "Comience a escribir"
-    end
-    Thread.start do
-      while entrada=sesion.gets
-        sesion.puts entrada
-      puts "cliente: #{entrada}"
+
+  server = TCPServer.open(port)
+  usuarios=[]
+  #Thread para cada conexion
+  #El servidor acepta a los que intenten conectarse
+
+    while(sesion=server.accept)
+      usuarios.push(sesion)
+      hilo=Thread.start sesion do |conecct|
+        while entrada=conecct.gets and entrada!="/close"
+          puts usuarios.length
+          puts "cliente: #{entrada}"
+          usuarios.each do |i|
+            i.puts "#{entrada}"
+            puts i
+          end
+        end
+        usuarios=Auxiliares.new.busquedaArreglo(conecct,usuarios)
+        hilo.kill
+        puts "Un usario a salido"
+        conecct.close
+        #-------Salida del while-------------
+      end
     end
 
-      puts "Enviando adios"
-      sesion.puts "Server: Adios\n"
-      sesion.stop
-    end
-  end
+
 end

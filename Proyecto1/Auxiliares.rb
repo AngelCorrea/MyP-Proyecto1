@@ -1,14 +1,11 @@
 class Auxiliares
+def instruccionesAyuda
+  puts "Estas son los comandos que tiene el servidor"
+  puts "/close -> Este comando lo sacara del cliente"
+  puts "/usuarios -> Te devolvera los nombres de los
+  usuarios conectados"
+  puts "/grupo [NombreDelGrupo] [usr] .. [usr] -> Para crear un grupo privado de chat"
+  puts "/"
+end
 
-  def busquedaArreglo(elemento,arreglo)
-    i=0
-    while(i<arreglo.length)
-      if(arreglo[i].equal? elemento)
-        arreglo.delete(i)
-        return arreglo
-      else
-        i+=1
-      end
-    end
-  end
 end

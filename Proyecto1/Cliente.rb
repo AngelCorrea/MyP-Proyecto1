@@ -11,10 +11,8 @@ class Cliente
 
   puts "Introduzca su nombre de usuario: "
   name= gets.chop
-  puts "Su usuario es #{name}\n"
-
-s = TCPSocket.open(host, port) # host / puerto
-
+  s = TCPSocket.open(host, port) # host / puerto
+  s.puts name
   entradaMensajes=Thread.new{
     while msg= s.gets
       puts msg
@@ -23,7 +21,7 @@ s = TCPSocket.open(host, port) # host / puerto
   #Recibe los mensajes del usuario y los envia a el servidor
 
   while m=gets.chop do
-    s.puts "#{name}: "+m
+    s.puts m
     if m=="/close"
       puts "Saliendo del servidor..."
       s.puts "#{name} desconectandose"

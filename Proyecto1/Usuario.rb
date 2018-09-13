@@ -1,14 +1,6 @@
-class Usuario
-  attr_accessor :nombre
+class Auxiliares
+  def contieneElemento(diccionario)
 
-  #def initialize(nombre)
-  #  self.nombre=nombre
-  #end
-  def setNombre(nombre)
-    self.nombre=nombre
-  end
-  def getNombre()
-    return nombre
   end
 
 end

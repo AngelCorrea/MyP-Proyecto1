@@ -15,7 +15,7 @@ class Servidor
     loop {
       sesion = @socketPrincipal.accept
       @hilo=Thread.start (sesion) do |conecct|
-        conecct.puts "Bienvenido al servidor :D"
+        conecct.puts "Bienvenido al servidor :D\n Use \"HELP\" para ver los comandos del servidor"
         comunicacionChat(conecct)
       end
     }.join
@@ -23,19 +23,10 @@ class Servidor
 
 
   def comunicacionChat(socketUsuario)
-  #def comunicacionChat(usuario, socketUsuario)
     begin
       loop do
         entrada=socketUsuario.gets
         s=AccionesCliente.new.comandos(entrada,@clientes,socketUsuario)
-        #socketUsuario.puts s
-        #if entrada=="/close"
-        #  break
-        #end
-        #puts @clientes
-        #@clientes.keys.each do |usr|
-          #@clientes[usr].puts "#{usuario}: #{entrada}"
-        #end
       end
     rescue Errno::EPIPE
       @clientes.delete(usuario)

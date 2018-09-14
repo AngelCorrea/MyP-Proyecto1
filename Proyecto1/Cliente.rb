@@ -1,6 +1,4 @@
 require 'socket'
-require './Usuario'
-
 class Cliente
 
   host="localhost"

@@ -1,11 +1,12 @@
 require 'socket'
-require './AccionesCliente.rb'
+#require './AccionesCliente.rb'
+require "./Acciones.rb"
 class Servidor
 
   def initialize (puerto)
     @socketPrincipal=TCPServer.open(puerto)
 
-    @clientes =Hash.new
+    @clientes =[]
 
     puts "Servidor iniciandose..."
     startServer()
@@ -26,7 +27,8 @@ class Servidor
     begin
       loop do
         entrada=socketUsuario.gets
-        s=AccionesCliente.new.comandos(entrada,@clientes,socketUsuario)
+        #s=AccionesCliente.new.comandos(entrada,@clientes,socketUsuario)
+        s=Acciones.new.comandos(entrada,@clientes,socketUsuario)
       end
     rescue Errno::EPIPE
       @clientes.delete(usuario)

@@ -1,12 +1,12 @@
 class Sala
-  def initialize(nombreSala,diccionarioSala)
+  def initialize(nombreSala,listaSala)
     @nombreSala=nombreSala
-    @diccionarioSala=diccionarioSala
+    @listaSala=listaSala
   end
-  def nombreSala
+  def name
     return @nombreSala
   end
-  def diccionarioSala
-    return @diccionarioSala
+  def lista
+    return listaSala
   end
 end

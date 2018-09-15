@@ -1,40 +1,36 @@
 require "./Instrucciones.rb"
 require "./Sala.rb"
 class AccionesCliente
-  def initialize()
-    @rooms=[]
-  end
+    @@rooms=[]
 
   def accionRoomMessage(comando,usuariosDiccionario,socketUsuario)
     orden=comando.split(" ",3)
     if(orden[1]==nil)
       socketUsuario.puts "Debes ingresar el nombre de una sala"
-    elsif (!existeSala?(@rooms,orden[1]))
+    elsif (!existeSala?(@@rooms,orden[1]))
       socketUsuario.puts "La sala no existe"
     else
-      puts "ENTRE AL ROOM MESSAGE"
-      diccion=buscaDiccionarioSala(@rooms,"#{orden[1]}")
-      puts"_ [#{orden[1]}]#{orden[2] }","#{diccion}#{socketUsuario}"
-      puts accionUsers(diccion,socketUsuario)
-      accionPublicMessage("_ [#{orden[1]}]#{orden[2] }",diccion,socketUsuario)
+      s=orden[1]
+      diccion=buscaDiccionarioSala(@@rooms,s)
+      accionPublicMessage("_ [#{s}]#{orden[2] }",diccion,socketUsuario)
     end
   end
 
   def existeSala?(salas,name)
     salas.each do |i|
-      if i.nombreSala.equal? name
-        puts i.nombreSala
+      s=i.nombreSala
+      if s ==name
         return true
       else
-        i.nombreSala
-        return false
+        next
       end
     end
+    return false
   end
 
-  def buscaDiccionarioSala(arreglo,nombre)
-    arreglo.each do |i|
-      if i.nombreSala.equal? name
+  def buscaDiccionarioSala(sala,nombre)
+    sala.each do |i|
+      if i.nombreSala == nombre
         return i.diccionarioSala
       else
         return nil
@@ -42,12 +38,11 @@ class AccionesCliente
     end
   end
 
-
   def accionIdentify(comando,usuariosDiccionario,socketUsuario)
     orden=comando.split(" ")
     username=orden[1]
     if(username==nil)
-      puts socketUsuario.puts "Necesitas ingresar un nombre"
+      socketUsuario.puts "Necesitas ingresar un nombre"
     elsif (!usuariosDiccionario[socketUsuario].equal?nil)
       socketUsuario.puts "Este usuario ya esta ocupado"
     else
@@ -101,20 +96,17 @@ class AccionesCliente
     orden=comando.split(" ")
     if(orden[1]==nil)
       socketUsuario.puts "Debes ingresar un nombre para tu sala"
-    elsif(!existeSala?(@rooms,orden[1]))
+    elsif(existeSala?(@@rooms,orden[1]))
       socketUsuario.puts "El nombre de esta sala ya esta ocupado"
     else
       diccionarioSala=Hash.new
       username=usuariosDiccionario[socketUsuario]
       accionIdentify("_ [#{orden[1]}]#{username}",diccionarioSala,socketUsuario)
       salaNueva=Sala.new(orden[1],diccionarioSala)
-      @rooms.push salaNueva
+      @@rooms.push salaNueva
       socketUsuario.puts "Has creado una sala: #{orden[1]}"
     end
   end
-
-
-
 
 
   def comandos(comando,usuariosDiccionario,socketUsuario)

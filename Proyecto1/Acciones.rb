@@ -231,7 +231,19 @@ class Acciones
     end
   end
 
-  def accionDisconnect(comando,usuariosLista,socketUsuario)
+  def accionDisconnect(usuariosLista,socketUsuario)
+    usr=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
+    for i in @@rooms
+      if i.lista.include?(usr)
+        i.lista.delete(usr)
+      else
+        next
+      end
+    end
+    usuariosLista.delete(usr)
+    socketUsuario.puts "Se ha desconectado del servidor.\nGracias por su visita"
+    socketUsuario.close
+  end
 
   def comandos(comando,usuariosLista,socketUsuario)
     #begin
@@ -259,9 +271,7 @@ class Acciones
     when "ROOMESSAGE"
       accionRoomMessage(comando,usuariosLista,socketUsuario)
     when "DISCONNECT"
-
-      usuariosLista.delete(socketUsuario)
-      socketUsuario.close
+      accionDisconnect(usuariosLista,socketUsuario)
     else
       socketUsuario.puts "Comando no identificado, use HELP para mostrar los comandos"
     end

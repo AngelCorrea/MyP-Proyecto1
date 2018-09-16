@@ -4,10 +4,65 @@ require "./Usuario.rb"
 class Acciones
   @@rooms=[] #Arreglo para salas (nombreSala,usuariosLista)
 
+
+  def buscaUsuarioPorSocket(arreglo,socketUsuario)
+    arreglo.each do |usr|
+      if(usr.socket.equal? socketUsuario)
+        return usr
+      else
+        next
+      end
+    end
+    return nil
+  end
+
+  def buscaUsuarioPorNombre(arreglo,nombre)
+    arreglo.each do |usr|
+      if(usr.name== nombre)
+        return usr
+      else
+        next
+      end
+    end
+    return nil
+  end
+  def existeSala?(nombre)
+    for i in @@rooms
+      if i.name == nombre
+        return true
+      else
+        next
+      end
+    end
+    return false
+  end
+  def getSala(nombre)
+    for i in @@rooms
+      if i.name == nombre
+        return i
+      else
+        next
+      end
+    end
+    return nil
+  end
+
+  def nombreExiste? (nombre,usuariosLista)
+    for i in usuariosLista
+      if(i.name == nombre)
+        return true
+      else
+        next
+      end
+    end
+    return false
+  end
+
   def accionIdentify(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
     username=orden[1]
-    usr=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
+    puts username
+    puts usuariosLista
     if(username==nil)
       socketUsuario.puts "Necesitas ingresar un nombre"
     elsif (nombreExiste?(username,usuariosLista))
@@ -41,53 +96,10 @@ class Acciones
     end
   end
 
-
-  def buscaUsuarioPorSocket(arreglo,socketUsuario)
-    arreglo.each do |usr|
-      if(usr.socket.equal? socketUsuario)
-        return usr
-      else
-        next
-      end
-    end
-    return nil
-  end
-
-  def buscaUsuarioPorNombre(arreglo,nombre)
-    arreglo.each do |usr|
-      if(usr.name== nombre)
-        return usr
-      else
-        next
-      end
-    end
-    return nil
-  end
-  def existeSala?(nombre)
-    for i in @@rooms
-      if i.name == nombre
-        return true
-      else
-        next
-      end
-    end
-    return false
-  end
-  def nombreExiste? (nombre,usuariosLista)
-    for i in usuariosLista
-      if(i.name == nombre)
-        return true
-      else
-        next
-      end
-    end
-    return false
-  end
-
   def accionUsers(usuariosLista,socketUsuario)
     s="Usuarios Identificados: \n"
     for i in usuariosLista
-      s=s+i.name+"\n"
+      s=s+"[#{i.status}]"+i.name+"\n"
     end
     socketUsuario.puts s
   end
@@ -109,8 +121,8 @@ class Acciones
       socketUsuario.puts "Este usuario no existe"
     else
       mensaje=comando.split(" ",3)
-      usr.socket.puts "-[Privado]-(#{usr.status})#{usr.name}: #{mensaje[2]}"
-      usrDestino.socket.puts "-[Privado]-(#{usr.status})#{usr.name}: #{mensaje[2]}"
+      usr.socket.puts "-[Privado]-#{usr.name}: #{mensaje[2]}"
+      usrDestino.socket.puts "-[Privado]-#{usr.name}: #{mensaje[2]}"
     end
   end
 
@@ -123,7 +135,11 @@ class Acciones
       socketUsuario.puts "Debes ingresar un mensaje"
     else
       for cliente in usuariosLista
-        cliente.socket.puts "[#{usr.status}] #{usr.name}: #{mensaje[1]}"
+        if(cliente.respond_to? "socket")
+          cliente.socket.puts "#{usr.name}: #{mensaje[1]}"
+        else
+          next
+        end
       end
     end
   end
@@ -146,6 +162,77 @@ class Acciones
     end
   end
 
+  def accionRoomMessage(comando,usuariosLista,socketUsuario)
+    orden=comando.split(" ",3)
+    nombreSala=orden[1]
+    mensaje=orden[2]
+    usuario=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
+    sala=getSala(nombreSala)
+    if(nombreSala==nil)
+      socketUsuario.puts "Debes ingresar el nombre de una sala"
+    elsif (!existeSala?(nombreSala))
+      socketUsuario.puts "La sala no existe"
+    elsif (buscaUsuarioPorSocket(sala.lista,socketUsuario)==nil)
+      socketUsuario.puts "No perteneces a esta sala"
+    else
+      accionPublicMessage("_ #{orden[2]}",sala.lista,socketUsuario)
+    end
+  end
+
+  def accionInvite(comando,usuariosLista,socketUsuario)
+    orden=comando.split(" ")
+    nombreSala=orden[1]
+    sala=getSala(nombreSala)
+    admin=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
+    usuariosChat=nil
+    if(sala.respond_to? "lista")
+      usuariosChat=sala.lista
+    end
+    if(sala == nil)
+      socketUsuario.puts "La sala #{nombreSala} no existe."
+    elsif (usuariosChat[0].== admin)
+      socketUsuario.puts "No eres el dueño de la sala"
+    elsif (orden[2] == nil)
+      socketUsuario.puts "Debes escribir el nombre de un usuario conectado"
+    else
+      i=2
+      usuariosOff="Estos usuarios no se encontraron: \n"
+      while i < orden.length
+        usr=buscaUsuarioPorNombre(usuariosLista,orden[i])
+        if(usr == nil)
+          usuariosOff=usuariosOff+ "#{orden[i]}"
+        else
+          invitado=buscaUsuarioPorNombre(usuariosLista,orden[i])
+          invitado.socket.puts "#{usuariosChat[0].name} te a invitado a la sala [#{sala.name}]"
+          usuariosChat.push (orden[i])
+
+        end
+        i=i+1
+      end
+      if("Estos usuarios no se encontraron: \n" != usuariosOff)
+        socketUsuario.puts usuariosOff
+      end
+    end
+  end
+
+  def accionJoinRoom(comando,usuariosLista,socketUsuario)
+    orden=comando.split(" ")
+    nombreSala=orden[1]
+    usuario=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
+    sala=getSala(nombreSala)
+    salaLista=sala.lista
+    if (sala == nil)
+      socketUsuario.puts "Esta sala no existe"
+    elsif (!salaLista.include?(usuario.name))
+      socketUsuario.puts "No fuiste invitado a la sala"
+    else
+      salaLista.delete(usuario.name)
+      accionIdentify("_ [#{nombreSala}]#{usuario.name}",salaLista,socketUsuario)
+    end
+  end
+
+  def accionDisconnect(comando,usuariosLista,socketUsuario)
+
   def comandos(comando,usuariosLista,socketUsuario)
     #begin
     orden=comando.split(" ")
@@ -166,12 +253,13 @@ class Acciones
     when "CREATEROOM"
       accionCreateRoom(comando,usuariosLista,socketUsuario)
     when "INVITE"
-
+      accionInvite(comando,usuariosLista,socketUsuario)
     when "JOINROOM"
-
+      accionJoinRoom(comando,usuariosLista,socketUsuario)
     when "ROOMESSAGE"
       accionRoomMessage(comando,usuariosLista,socketUsuario)
     when "DISCONNECT"
+
       usuariosLista.delete(socketUsuario)
       socketUsuario.close
     else

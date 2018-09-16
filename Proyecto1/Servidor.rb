@@ -27,7 +27,6 @@ class Servidor
     begin
       loop do
         entrada=socketUsuario.gets
-        #s=AccionesCliente.new.comandos(entrada,@clientes,socketUsuario)
         s=Acciones.new.comandos(entrada,@clientes,socketUsuario)
       end
     rescue Errno::EPIPE

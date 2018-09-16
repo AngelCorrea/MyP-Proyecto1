@@ -7,6 +7,6 @@ class Sala
     return @nombreSala
   end
   def lista
-    return listaSala
+    return @listaSala
   end
 end

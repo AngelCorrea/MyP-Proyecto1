@@ -61,8 +61,6 @@ class Acciones
   def accionIdentify(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
     username=orden[1]
-    puts username
-    puts usuariosLista
     if(username==nil)
       socketUsuario.puts "Necesitas ingresar un nombre"
     elsif (nombreExiste?(username,usuariosLista))
@@ -241,39 +239,41 @@ class Acciones
       end
     end
     usuariosLista.delete(usr)
-    socketUsuario.puts "Se ha desconectado del servidor.\nGracias por su visita"
     socketUsuario.close
   end
 
   def comandos(comando,usuariosLista,socketUsuario)
-    #begin
-    orden=comando.split(" ")
-    case orden[0]
-    when "HELP"
-      s=Instrucciones.new.instruccionesAyuda()
-      socketUsuario.puts s
-    when "IDENTIFY"
-      accionIdentify(comando,usuariosLista,socketUsuario)
-    when "STATUS"
-      accionStatus(comando,usuariosLista,socketUsuario)
-    when "USERS"
-      accionUsers(usuariosLista,socketUsuario)
-    when "MESSAGE"
-      accionMessage(comando,usuariosLista,socketUsuario)
-    when "PUBLICMESSAGE"
-      accionPublicMessage(comando,usuariosLista,socketUsuario)
-    when "CREATEROOM"
-      accionCreateRoom(comando,usuariosLista,socketUsuario)
-    when "INVITE"
-      accionInvite(comando,usuariosLista,socketUsuario)
-    when "JOINROOM"
-      accionJoinRoom(comando,usuariosLista,socketUsuario)
-    when "ROOMESSAGE"
-      accionRoomMessage(comando,usuariosLista,socketUsuario)
-    when "DISCONNECT"
-      accionDisconnect(usuariosLista,socketUsuario)
-    else
-      socketUsuario.puts "Comando no identificado, use HELP para mostrar los comandos"
+    begin
+      orden=comando.split(" ")
+      case orden[0]
+      when "HELP"
+        s=Instrucciones.new.instruccionesAyuda()
+        socketUsuario.puts s
+      when "IDENTIFY"
+        accionIdentify(comando,usuariosLista,socketUsuario)
+      when "STATUS"
+        accionStatus(comando,usuariosLista,socketUsuario)
+      when "USERS"
+        accionUsers(usuariosLista,socketUsuario)
+      when "MESSAGE"
+        accionMessage(comando,usuariosLista,socketUsuario)
+      when "PUBLICMESSAGE"
+        accionPublicMessage(comando,usuariosLista,socketUsuario)
+      when "CREATEROOM"
+        accionCreateRoom(comando,usuariosLista,socketUsuario)
+      when "INVITE"
+        accionInvite(comando,usuariosLista,socketUsuario)
+      when "JOINROOM"
+        accionJoinRoom(comando,usuariosLista,socketUsuario)
+      when "ROOMESSAGE"
+        accionRoomMessage(comando,usuariosLista,socketUsuario)
+      when "DISCONNECT"
+        accionDisconnect(usuariosLista,socketUsuario)
+      else
+        socketUsuario.puts "Comando no identificado, use HELP para mostrar los comandos"
+      end
+    rescue IOError
+      puts "Un usuario se a desconectado"
     end
   end
 end

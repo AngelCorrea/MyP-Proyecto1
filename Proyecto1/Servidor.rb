@@ -24,15 +24,18 @@ class Servidor
 
 
   def comunicacionChat(socketUsuario)
+    socket=socketUsuario
     begin
-      loop do
-        entrada=socketUsuario.gets
+      while entrada=socketUsuario.gets
         s=Acciones.new.comandos(entrada,@clientes,socketUsuario)
       end
-    rescue Errno::EPIPE
-      @clientes.delete(usuario)
       puts " Usuario desconectado "
-      puts @clientes.to_s + "Usuarios actuales"
+      Acciones.new.accionDisconnect(@clientes,socket)
+      @hilo.exit
+      socketUsuario.close
+    rescue IOError
+      puts " Usuario desconectado "
+      Acciones.new.accionDisconnect(@clientes,socket)
       @hilo.exit
       socketUsuario.close
     end

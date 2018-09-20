@@ -1,13 +1,11 @@
 require 'socket'
 class Cliente
-
-  host="localhost"
+#10.42.0.46
+  host="10.42.0.86"#"localhost"
   port="1234"
   begin
-    #puts "Introduzca su nombre de usuario: "
-    #name= gets.chop
+
     s = TCPSocket.open(host, port) # host / puerto
-    #s.puts name
     entradaMensajes=Thread.new{
       while msg= s.gets
         puts msg
@@ -21,6 +19,5 @@ class Cliente
   rescue Errno::EPIPE
     entradaMensajes.kill
     puts "Saliendo del servidor..."
-    puts "#{name} desconectandose"
   end
 end

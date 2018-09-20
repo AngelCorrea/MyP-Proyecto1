@@ -33,7 +33,7 @@ class Servidor
       Acciones.new.accionDisconnect(@clientes,socket)
       @hilo.exit
       socketUsuario.close
-    rescue IOError
+    rescue Errno::EPIPE
       puts " Usuario desconectado "
       Acciones.new.accionDisconnect(@clientes,socket)
       @hilo.exit

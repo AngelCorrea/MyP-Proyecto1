@@ -16,7 +16,7 @@ class Servidor
     loop {
       sesion = @socketPrincipal.accept
       @hilo=Thread.start (sesion) do |conecct|
-        conecct.puts "Bienvenido al servidor :D\n Use \"HELP\" para ver los comandos del servidor"
+        conecct.puts "Bienvenido al servidor :D\nUse \"HELP\" para ver los comandos del servidor"
         comunicacionChat(conecct)
       end
     }.join

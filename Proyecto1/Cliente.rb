@@ -1,8 +1,11 @@
 require 'socket'
 class Cliente
-  @ip="localhost"
-  @port="1234"
-  @@socket = TCPSocket.open(@host, @port) # host / puerto
+
+  def initialize(socket)
+  @@socket = socket # host / puerto  
+  end
+
+
   def enviarMensaje(mensaje)
     @@socket.puts mensaje
   end

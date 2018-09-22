@@ -1,7 +1,7 @@
 # MyP-Proyecto1-Proyecto 1 del curso de Modelado y Programacion (Chat)
 Autor: Correa Garcia Jose Angel
 
-Dependencias
+"Dependencias
 	-"ruby 2.5.1p57" (Estructura general)
 	- RUBYGEMS VERSION: 2.7.7
 	-fxruby (1.6.39) (Interfaz Grafica)
@@ -14,3 +14,4 @@ Como ejecutar el cliente:
 Como ejecutar el servidor:
    -Llame a la clase "Servidor" de la siguiente manera.
 	"ruby Servidor.rb"
+"

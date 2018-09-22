@@ -1,5 +1,4 @@
-# MyP-Proyecto1-
-Proyecto 1 del curso de Modelado y Programacion (Chat)
+# MyP-Proyecto1-Proyecto 1 del curso de Modelado y Programacion (Chat)
 Autor: Correa Garcia Jose Angel
 
 Dependencias

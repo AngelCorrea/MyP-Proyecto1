@@ -1,4 +1,7 @@
 class Instrucciones
+  #Clase Instrucciones
+  #Metodo para devolver las instrucciones de ayuda.
+  #Devuelve las instrucciones de ayuda.
   def instruccionesAyuda()
     return "• IDENTIFY username\n
     Este comando identifica al usuario, username será el nombre del usuario, ejemplo: IDENTIFY Kimberly\n
@@ -23,4 +26,6 @@ class Instrucciones
     • DISCONNECT\n
     El usuario se desconecta del servidor, ejemplo: DISCONNECT\n"
   end
+
 end
+#Fin de la clase

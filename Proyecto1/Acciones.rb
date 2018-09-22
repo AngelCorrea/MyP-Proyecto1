@@ -4,7 +4,8 @@ require "./Usuario.rb"
 class Acciones
   @@rooms=[] #Arreglo para salas (nombreSala,usuariosLista)
 
-
+#Metodo de busqueda por medio de socket/
+#Devuelve uno objeto usuario si se encuentra, si no, nil
   def buscaUsuarioPorSocket(arreglo,socketUsuario)
     arreglo.each do |usr|
       if(usr.socket.equal? socketUsuario)
@@ -16,6 +17,8 @@ class Acciones
     return nil
   end
 
+  #Metodo de busqueda por medio de nombre de usuario/
+  #Devuelve uno objeto usuario si se encuentra, si no, nil
   def buscaUsuarioPorNombre(arreglo,nombre)
     arreglo.each do |usr|
       if(usr.name== nombre)
@@ -26,6 +29,8 @@ class Acciones
     end
     return nil
   end
+  #Metodo para verificar la existencia de una sala, por su nombre.
+  #Devuelve true si la sala existe, false en otro caso
   def existeSala?(nombre)
     for i in @@rooms
       if i.name == nombre
@@ -36,6 +41,9 @@ class Acciones
     end
     return false
   end
+
+  #Metodo para buscar una sala por su nombre.
+  #Devuelve la sala si la encuentra, nil en otro caso
   def getSala(nombre)
     for i in @@rooms
       if i.name == nombre
@@ -47,6 +55,8 @@ class Acciones
     return nil
   end
 
+  #Metodo para verificar la existencia de un nombre registrado
+  #Devuelve true si existe el nombre, false en otro caso.
   def nombreExiste? (nombre,usuariosLista)
     for i in usuariosLista
       if(i.name == nombre)
@@ -57,7 +67,14 @@ class Acciones
     end
     return false
   end
-
+  #Metodo para identificar un usuario.
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Verificamos si el comando esta en la estructura que se solicita,
+  #Si lo esta y su nombre no se repite, creamos un objeto "usuario", asociandole
+  #su socket, su nombre, un estado predefinido como [ACTIVE] y lo
+  #agregamos a la lista de usuarios.
   def accionIdentify(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
     username=orden[1]
@@ -74,6 +91,14 @@ class Acciones
       accionPublicMessage(s,usuariosLista,socketUsuario)
     end
   end
+
+  #Metodo para cambiar el status de un usuario
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Verificamos que el comando que nos manda contenga un estado valido
+  #(ACTIVE AWAY BUSY) si cumple con esto, buscamos al usuario registrado
+  #y le cambiamos su estado.
 
   def accionStatus(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
@@ -94,6 +119,10 @@ class Acciones
     end
   end
 
+  #Metodo para consultar la lista de usuarios identificados.
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Devolvemos la lista de usuarios en una sola cadena.
   def accionUsers(usuariosLista,socketUsuario)
     s="Usuarios Identificados: \n"
     for i in usuariosLista
@@ -102,7 +131,14 @@ class Acciones
     socketUsuario.puts s
   end
 
-
+  #Metodo para enviar mensajes privados
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Comprobamos que el usuario que envia el mensaje y al que le llegara esten
+  #registrados, si lo estan, buscamos al usuario que envia y al que recibe,
+  #mandamos su nombre concatenado a el mensaje, y se lo mandamos al socket del
+  #usuario receptor.
   def accionMessage(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
     nombreDestino=orden[1]
@@ -123,7 +159,13 @@ class Acciones
       usrDestino.socket.puts "-[Privado]-#{usr.name}: #{mensaje[2]}"
     end
   end
-
+  #Metodo para mensajes publicos
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Recibimos el mensaje, si el usuario esta identificado, adjuntamos su nombre
+  #y el mensaje e iteramos sobre "usuariosLista" enviandoselo a todos los socket
+  #de la lista.
   def accionPublicMessage(comando,usuariosLista,socketUsuario)
     mensaje=comando.split(" ",2)
     usr=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
@@ -142,6 +184,14 @@ class Acciones
     end
   end
 
+  #Metodo para crear salas de chat
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Verificamos si el usuario esta identificado, si lo esta, de "comando",
+  #revisamos si el nombre de la sala no esta ocupado, si no lo esta, creamos el
+  #objeto Sala, a la que se le asigna un arreglo/lista y su nombre.
+  #Siempre se agrega primero al que creo la sala, por lo que el sera el admin.
   def accionCreateRoom(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
     usr=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
@@ -160,6 +210,13 @@ class Acciones
     end
   end
 
+  #Metodo para mandar un mensaje a una sala de chat
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Verificamos en "comando" que la redaccion del comando sea correcta, revisamos
+  #que la sala exista, y si existe, mandamos el mensaje a todos los usuarios
+  #conectados en la sala por medios de sus sockets
   def accionRoomMessage(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ",3)
     nombreSala=orden[1]
@@ -176,7 +233,15 @@ class Acciones
       accionPublicMessage("_ #{orden[2]}",sala.lista,socketUsuario)
     end
   end
-
+  #Metodo para invitar usuarios a una sala de chat
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Verificamos que la sala exista, si existe, verificamos que seas el admin.
+  #si no eres el admin, no puedes invitar a nadie. Enviamos un mensaje a los
+  #usuarios que esten conectados haciendoles saber de la invitacion, y agregamos
+  #su nombre como "clave", para que cuando acepten, quitar el nombre e
+  #identificarlos
   def accionInvite(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
     nombreSala=orden[1]
@@ -203,7 +268,6 @@ class Acciones
           invitado=buscaUsuarioPorNombre(usuariosLista,orden[i])
           invitado.socket.puts "#{usuariosChat[0].name} te a invitado a la sala [#{sala.name}]"
           usuariosChat.push (orden[i])
-
         end
         i=i+1
       end
@@ -213,6 +277,13 @@ class Acciones
     end
   end
 
+  #Metodo para que un usuario invitado a una sala pueda unirse
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Verificamos que la sala exista, que su nombre este en la lista de usuarios,
+  #y si lo esta, quitamos el nombre, e identificamos al usuario dentro de la
+  #lista de usuarios de la sala, asociandole un objeto "usuario"
   def accionJoinRoom(comando,usuariosLista,socketUsuario)
     orden=comando.split(" ")
     nombreSala=orden[1]
@@ -229,6 +300,12 @@ class Acciones
     end
   end
 
+  #Metodo para desconectar usuarios.
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Para la lista de salas, buscamos al usuarios, si es que existe en alguna de
+  #ellas y lo eliminamos.
+  #Lo eliminamos de la lista de usuarios en general y cerramos su socket
   def accionDisconnect(usuariosLista,socketUsuario)
     usr=buscaUsuarioPorSocket(usuariosLista,socketUsuario)
     for i in @@rooms
@@ -242,6 +319,13 @@ class Acciones
     socketUsuario.close
   end
 
+  #Metodo que filtrara la cadena enviada, y ejecutara la accion solicitada
+  #-comando- Tipo String
+  #-usuariosLista- Tipo Arreglo
+  #-socketUsuario- Socket del usuario
+  #Dividimoss la cadena "comando" y el primer elemento siempre debera de ser
+  #la instruccion que quiere ejecutarse, de no ser valida, se le enviara un
+  #mensaje al cliente, en otro caso, se llamara al metodo correspondiente.
   def comandos(comando,usuariosLista,socketUsuario)
     begin
       orden=comando.split(" ")
@@ -276,4 +360,5 @@ class Acciones
       puts "Un usuario se a desconectado"
     end
   end
+  #Fin de la clase.
 end
